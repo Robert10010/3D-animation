@@ -102,6 +102,11 @@ public class JoyconMotionController : MonoBehaviour
     [Tooltip("當角速度低於此數值時視為靜止，停止更新旋轉以濾除緩慢漂移")]
     public float stationaryThreshold = 0.05f;
 
+    [Header("Calibration Settings (角度校準)")]
+    [Tooltip("手動角度歸零/校準按鍵 (預設為 R 鍵)")]
+    public KeyCode calibrationKey = KeyCode.R;
+
+
     [Header("Debug")]
     public bool showDebugGUI = true;
 
@@ -268,13 +273,20 @@ public class JoyconMotionController : MonoBehaviour
 
         if (!m_imuInitDone) return; // 初始化還沒完成先不動物件
 
+        // 偵測手動角度歸零校準
+        if (Input.GetKeyDown(calibrationKey))
+        {
+            ResetGyroRotation();
+        }
+
         // ── 防漂移過濾處理 (Delta 累加法) ──
         if (!m_rotInitialized)
         {
             m_lastRawRot = m_deviceRot;
-            m_filteredRot = m_deviceRot;
+            m_filteredRot = Quaternion.identity; // ➔ 初始化為單位矩陣（起點角度），消除初始偏差
             m_rotInitialized = true;
         }
+
 
         Vector3 currentAngVel = m_angVel;
         if (m_biasMeasured && autoCorrectGyroBias)
@@ -555,6 +567,17 @@ public class JoyconMotionController : MonoBehaviour
         while (angle < -180f) angle += 360f;
         return angle;
     }
+
+    /// <summary>
+    /// 手動將陀螺儀角度歸零校準，消除偏角
+    /// </summary>
+    public void ResetGyroRotation()
+    {
+        m_lastRawRot = m_deviceRot;
+        m_filteredRot = Quaternion.identity;
+        Debug.Log("[JoyCon] ➔ 陀螺儀角度已成功歸零重設！");
+    }
+
 
     /// <summary>
     /// 將 Joy-Con 的四元數轉換到 Unity 期望的軸向。
