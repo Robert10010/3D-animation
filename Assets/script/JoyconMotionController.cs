@@ -111,6 +111,7 @@ public class JoyconMotionController : MonoBehaviour
     private Vector3 m_gravityAccel;
     private const float kGravityAlpha = 0.8f;
 
+
     // ---- 防漂移記憶變數 ----
     private Quaternion m_lastRawRot = Quaternion.identity;
     private Quaternion m_filteredRot = Quaternion.identity;
@@ -161,6 +162,8 @@ public class JoyconMotionController : MonoBehaviour
         if (SwitchControllerHID.current != null)
             StartCoroutine(InitJoyconDelayed(SwitchControllerHID.current));
     }
+
+
 
     void OnDisable()
     {
@@ -439,6 +442,9 @@ public class JoyconMotionController : MonoBehaviour
             );
         }
     }
+
+
+
 
     //────────────────────────────────────────────────────────────────
     void OnGUI()
